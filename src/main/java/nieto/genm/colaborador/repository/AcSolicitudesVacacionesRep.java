@@ -8,5 +8,5 @@ import nieto.genm.colaborador.model.AcSolicitudesVacaciones;
 
 public interface AcSolicitudesVacacionesRep extends JpaRepository<AcSolicitudesVacaciones, Integer>{
 	
-	List<AcSolicitudesVacaciones> findByIdUsuario(Integer idUsuario);
+	List<AcSolicitudesVacaciones> findByIdUsuarioOrderByCreatedatetimeDesc(Integer idUsuario);
 }

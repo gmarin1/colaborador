@@ -29,10 +29,10 @@ public class PortalService {
 	}
 	
 	public List<AcPeriodosVacaciones> obtenermodeloPeriodoVac (Integer idUsuario) {
-		return periodosVacaciones.findByIdUsuario(idUsuario);
+		return periodosVacaciones.findByIdUsuarioOrderByCreatedatetimeDesc(idUsuario);
 	}
 	
 	public List<AcSolicitudesVacaciones> obtenermodeloAcSolicitudes (Integer idUsuario) {
-		return solicitudesVacaciones.findByIdUsuario(idUsuario);
+		return solicitudesVacaciones.findByIdUsuarioOrderByCreatedatetimeDesc(idUsuario);
 	}
 }

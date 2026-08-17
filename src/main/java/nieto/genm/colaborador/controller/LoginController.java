@@ -22,7 +22,12 @@ public class LoginController {
 	private PortalService portalService;
 	
 	@GetMapping("/login")
-    public String loginview() {
+    public String loginview(HttpSession session) {
+		
+		if (session.getAttribute("usuario") != null) {
+	        return "redirect:/";
+	    }
+		
         return "login";
     }
 		
@@ -34,14 +39,14 @@ public class LoginController {
 		if(resultado.equals("ok")) {
 			AcUsuarios usuario = loginService.buscarXssoId(ssoId);
 			session.setAttribute("usuario", usuario);
-			return "redirect:/portal";
+			return "redirect:/";
 		}
 		
 		model.addAttribute("error", resultado);
         return "login";
 	}
 	
-	@GetMapping("/portal")
+	@GetMapping("/")
     public String portalview(HttpSession session, Model model) {
 		
 		AcUsuarios usuario = (AcUsuarios) session.getAttribute("usuario");
@@ -62,15 +67,6 @@ public class LoginController {
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 	    session.invalidate();
-	    return "redirect:/login";
-	}
-	
-	@GetMapping("/")
-	public String redireccion(HttpSession session) {
-	    if (session.getAttribute("usuarioLogueado") != null) {
-	        return "redirect:/portal";
-	    }
-	    
 	    return "redirect:/login";
 	}
 
