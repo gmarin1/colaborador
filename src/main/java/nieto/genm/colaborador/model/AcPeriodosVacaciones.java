@@ -104,4 +104,10 @@ public class AcPeriodosVacaciones  {
 
 	public LocalDateTime getUpdatedatetime() {return updatedatetime;}
 	public void setUpdatedatetime(LocalDateTime updatedatetime) {this.updatedatetime = updatedatetime;}
+	
+	public Integer getDiasDisponibles() {
+        int otorgados = (this.diasOtorgados != null) ? this.diasOtorgados : 0;
+        int tomados = (this.diasTomados != null) ? this.diasTomados : 0;
+        return otorgados - tomados;
+    }
 }

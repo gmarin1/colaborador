@@ -1,11 +1,15 @@
 package nieto.genm.colaborador.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import nieto.genm.colaborador.model.AcUsuarios;
@@ -51,7 +55,7 @@ public class LoginController {
 		
 		AcUsuarios usuario = (AcUsuarios) session.getAttribute("usuario");
 		
-		if (session.getAttribute("usuario") == null) {
+		if (usuario == null) {
             return "redirect:/login"; 
         }
 		
@@ -60,9 +64,34 @@ public class LoginController {
 		model.addAttribute("colaborador", portalService.obtenermodeloColaborador(idUsuario));
 		model.addAttribute("periodos", portalService.obtenermodeloPeriodoVac(idUsuario));
 		model.addAttribute("solicitudes", portalService.obtenermodeloAcSolicitudes(idUsuario));
+		model.addAttribute("diasDisponibles", portalService.diasDisponiblesTotales(idUsuario));
 		
         return "portal";
     }
+	
+	@PostMapping("/")
+	public String portalGenerarSolicitud(HttpSession session, RedirectAttributes redirectAttributes,
+											@RequestParam(value="fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+											@RequestParam(value="fechaFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+											@RequestParam("motivo") String motivo,
+											@RequestParam(value = "ultimoDiaTrabajado", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ultimoDiaTrabajado) {
+		
+		AcUsuarios usuario = (AcUsuarios) session.getAttribute("usuario");
+		
+		if (usuario == null)
+            return "redirect:/login"; 
+		
+		Integer idUsuario = usuario.getId();
+		String resultado = portalService.crearSolicitud(idUsuario, fechaInicio, fechaFin, motivo, ultimoDiaTrabajado);
+		
+		if ("OK".equalsIgnoreCase(resultado)) {
+	        redirectAttributes.addFlashAttribute("mensajeOk", "Solicitud de vacaciones creada, puedes visualizar el seguimiento en el apartado de *Mis solicitudes*.");
+	    } else {
+	        redirectAttributes.addFlashAttribute("mensajeError", resultado);
+	    }
+		
+		return "redirect:/";
+	}
 	
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {

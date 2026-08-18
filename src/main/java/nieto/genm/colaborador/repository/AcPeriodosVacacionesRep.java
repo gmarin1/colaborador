@@ -8,5 +8,7 @@ import nieto.genm.colaborador.model.AcPeriodosVacaciones;
 
 public interface AcPeriodosVacacionesRep extends JpaRepository<AcPeriodosVacaciones, Integer>{
 	
-	List<AcPeriodosVacaciones> findByIdUsuarioOrderByCreatedatetimeDesc(Integer idUsuario);
+	List<AcPeriodosVacaciones> findByIdUsuarioOrderByAnioPeriodoDesc(Integer idUsuario);
+	List<AcPeriodosVacaciones> findTop2ByIdUsuarioOrderByAnioPeriodoDesc(Integer idUsuario);
+	
 }

@@ -123,6 +123,15 @@ public class AcColaboradores {
 
 	@Column(name="updatedatetime", nullable = false)
 	private LocalDateTime updatedatetime = LocalDateTime.now();
+	
+	@Column(name="sindicalizado", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+	private Integer sindicalizado = 0;
+	
+	@Column(name="sindicato")
+	private Integer sindicato;
+	
+	@Column(name="dias_laborales", nullable = false, length = 20)
+	private String diasLaborales = "LUNES_VIERNES";
 
 	//constructor vacio
 	
@@ -237,5 +246,14 @@ public class AcColaboradores {
 
 	public LocalDateTime getUpdatedatetime() {return updatedatetime;}
 	public void setUpdatedatetime(LocalDateTime updatedatetime) {this.updatedatetime = updatedatetime;}
-		
+
+	public Integer getSindicalizado() {return sindicalizado;}
+	public void setSindicalizado(Integer sindicalizado) {this.sindicalizado = sindicalizado;}
+
+	public Integer getSindicato() {return sindicato;}
+	public void setSindicato(Integer sindicato) {this.sindicato = sindicato;}
+
+	public String getDiasLaborales() {return diasLaborales;}
+	public void setDiasLaborales(String diasLaborales) {this.diasLaborales = diasLaborales;}
+
 }
