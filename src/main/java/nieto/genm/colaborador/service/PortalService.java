@@ -86,8 +86,11 @@ public class PortalService {
 		
 		AcColaboradores colaborador = colaboradoresRep.findByIdUsuario(idUsuario);
 		
-		if (fechaInicio == null || fechaFin == null)
+		if (fechaInicio == null && fechaFin == null)
 	        return "No se selecciono ninguna fecha";
+		
+		if (fechaInicio != null && fechaFin == null)
+	        fechaFin = fechaInicio;
 		
 		if (fechaFin.isBefore(fechaInicio))
 	        return "Rango de fecha invalido";

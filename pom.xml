@@ -99,6 +99,8 @@
     	<version>3.1.2.RELEASE</version>
     </dependency>
     
+    
+    <!-- Validar la sesion del usuario -->
     <dependency>
     	<groupId>org.springframework.security</groupId>
     	<artifactId>spring-security-web</artifactId>
@@ -109,6 +111,13 @@
     	<groupId>org.springframework.security</groupId>
     	<artifactId>spring-security-config</artifactId>
     	<version>6.1.5</version>
+    </dependency>
+    
+    <!-- para los json -->
+    <dependency>
+    	<groupId>com.fasterxml.jackson.datatype</groupId>
+    	<artifactId>jackson-datatype-jsr310</artifactId>
+		<version>2.19.2</version>
     </dependency>
     
   </dependencies>

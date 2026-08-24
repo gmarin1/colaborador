@@ -132,6 +132,30 @@ public class AcColaboradores {
 	
 	@Column(name="dias_laborales", nullable = false, length = 20)
 	private String diasLaborales = "LUNES_VIERNES";
+	
+	@Column(name="foto")
+	private String foto;
+	
+	@Column(name="idmex")
+	private String idmex;
+	
+	@Column(name="contacto_emergencia_nombre_2", length = 100)
+	private String contactoEmergenciaNombre2;
+	
+	@Column(name="contacto_emergencia_parentesco_2", length = 50)
+	private String contactoEmergenciaParentesco2;
+	
+	@Column(name="contacto_emergencia_telefono_2", length = 15)
+	private String contactoEmergenciaTelefono2;
+	
+	@Column(name="contacto_emergencia_nombre_3", length = 100)
+	private String contactoEmergenciaNombre3;
+	
+	@Column(name="contacto_emergencia_parentesco_3", length = 50)
+	private String contactoEmergenciaParentesco3;
+	
+	@Column(name="contacto_emergencia_telefono_3", length = 15)
+	private String contactoEmergenciaTelefono3;
 
 	//constructor vacio
 	
@@ -256,4 +280,27 @@ public class AcColaboradores {
 	public String getDiasLaborales() {return diasLaborales;}
 	public void setDiasLaborales(String diasLaborales) {this.diasLaborales = diasLaborales;}
 
+	public String getFoto() {return foto;}
+	public void setFoto(String foto) {this.foto = foto;}
+
+	public String getIdmex() {return idmex;}
+	public void setIdmex(String idmex) {this.idmex = idmex;}
+
+	public String getContactoEmergenciaNombre2() {return contactoEmergenciaNombre2;}
+	public void setContactoEmergenciaNombre2(String contactoEmergenciaNombre2) {this.contactoEmergenciaNombre2 = contactoEmergenciaNombre2;}
+
+	public String getContactoEmergenciaParentesco2() {return contactoEmergenciaParentesco2;}
+	public void setContactoEmergenciaParentesco2(String contactoEmergenciaParentesco2) {this.contactoEmergenciaParentesco2 = contactoEmergenciaParentesco2;}
+
+	public String getContactoEmergenciaTelefono2() {return contactoEmergenciaTelefono2;}
+	public void setContactoEmergenciaTelefono2(String contactoEmergenciaTelefono2) {this.contactoEmergenciaTelefono2 = contactoEmergenciaTelefono2;}
+
+	public String getContactoEmergenciaNombre3() {return contactoEmergenciaNombre3;}
+	public void setContactoEmergenciaNombre3(String contactoEmergenciaNombre3) {this.contactoEmergenciaNombre3 = contactoEmergenciaNombre3;}
+
+	public String getContactoEmergenciaParentesco3() {return contactoEmergenciaParentesco3;}
+	public void setContactoEmergenciaParentesco3(String contactoEmergenciaParentesco3) {this.contactoEmergenciaParentesco3 = contactoEmergenciaParentesco3;}
+
+	public String getContactoEmergenciaTelefono3() {return contactoEmergenciaTelefono3;}
+	public void setContactoEmergenciaTelefono3(String contactoEmergenciaTelefono3) {this.contactoEmergenciaTelefono3 = contactoEmergenciaTelefono3;}
 }

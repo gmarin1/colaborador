@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>PORTAL DE COLABORADORES</title>
@@ -10,7 +10,6 @@
 <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
 <style>
-    /* Efecto hover suave para hacer interactivas las tarjetas */
     .card-hover {
         transition: transform 0.2s ease, shadow 0.2s ease;
         text-decoration: none;
@@ -32,11 +31,10 @@
 	      <strong>Portal de Colaboradores</strong>
 	    </a>
 		    <div class="d-flex flex-column align-items-end text-white">
-	            <span class="fs-5 fw-bold mb-1 text-center" 
-	                  th:text="${usuario != null ? usuario.firstName : session.usuario.firstName}">
-	                Nombre del Usuario
-	            </span>
-		    	<a href="logout" class="btn btn-danger" style="background-color: #c81430;">Cerrar Sesión</a>
+	            <span class="fs-5 fw-bold mb-1 text-center" id="nombreUsuario"></span>
+		    	<form th:action="@{/logout}" method="post" class="m-0 p-0">
+			        <button type="submit" class="btn btn-danger btn-sm" style="background-color: #c81430;">Cerrar Sesión</button>
+			    </form>
 		    </div>
 	  </div>
 	</nav>
@@ -51,7 +49,7 @@
 				<!-- BOTÓN / ENTIDAD 1 -->
 				<div class="col-12 col-md-4">
 					<div class="card h-100 border-0 shadow-sm text-center p-4 card-hover text-dark" 
-		                 onclick="mostrarPanel('panelPerfil')"
+		                 onclick="mostrarPanel('panelPerfil'), obtenerDatos()"
 		                 style="cursor: pointer;">
 						<div class="card-body d-flex flex-column align-items-center justify-content-center">
 							<div class="rounded-circle p-3 mb-3 text-white" style="background-color: #1a365d; width: 70px; height: 70px;">
@@ -68,7 +66,7 @@
 				<!-- BOTÓN / ENTIDAD 2 -->
 				<div class="col-12 col-md-4">
 					<div class="card h-100 border-0 shadow-sm text-center p-4 card-hover text-dark"
-						onclick="mostrarPanel('panelVacaciones')" 
+						onclick="mostrarPanel('panelVacaciones'), periodosVac()"
 	                 	style="cursor: pointer;">
 						<div class="card-body d-flex flex-column align-items-center justify-content-center">
 							<div class="rounded-circle p-3 mb-3 text-white" style="background-color: #1a365d; width: 70px; height: 70px;">
@@ -85,7 +83,7 @@
 				<!-- BOTÓN / ENTIDAD 3 -->
 				<div class="col-12 col-md-4">
 					<div class="card h-100 border-0 shadow-sm text-center p-4 card-hover text-dark"
-						onclick="mostrarPanel('panelSolicitudes')" 
+						onclick="mostrarPanel('panelSolicitudes'), solicitudesVac()" 
 		                style="cursor: pointer;">
 						<div class="card-body d-flex flex-column align-items-center justify-content-center">
 							<div class="rounded-circle p-3 mb-3 text-white" style="background-color: #1a365d; width: 70px; height: 70px;">
@@ -105,15 +103,18 @@
 	
 	<!-- PANEL 1: MI PERFIL -->
 	<div id="panelPerfil" class="card shadow border-0 d-none">
-		<div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: #1a365d;">
+		<div class="card-header text-white d-flex justify-content-between align-items-center py-3 px-3 px-md-4" style="background-color: #1a365d;">
 	    	<h5 class="card-title fw-bold mb-0">
 	        	<i class="bi bi-person-vcard me-2"></i>Información de Mi Perfil
 	        </h5>
-	        <button type="button" class="btn-close btn-close-white" onclick="regresarAlMenu()" aria-label="Close"></button>
+	        <button type="button" class="btn-close btn-close-white me-2 me-md-3" onclick="regresarAlMenu()" aria-label="Close"></button>
 	    </div>
 	            
 	    <div class="card-body p-4">
-	    	<div th:if="${colaborador != null}">
+	    	<div id="perfilNoEncontrado" class="alert alert-warning mb-0 d-none">
+	        	No se encontraron registros de perfil para este usuario.
+	        </div>
+	    	<div id="informacionPerfil" class="d-none">
 	        	<ul class="nav nav-tabs mb-4 flex-nowrap overflow-x-auto" id="perfilTab" role="tablist">
 	            	<li class="nav-item">
 	                	<button class="nav-link active fw-bold" id="personales-tab" data-bs-toggle="tab" data-bs-target="#personales-pane" type="button">
@@ -139,59 +140,49 @@
 			                <div class="col-md-6">
 			                    <div class="p-3 bg-light rounded border">
 			                        <label class="fw-bold text-muted d-block mb-1">Nombre</label>
-			                        <span class="fs-6 text-dark fw-semibold" th:text="${session.usuario.firstName +' '+ session.usuario.lastName}"></span>
+			                        <span class="fs-6 text-dark fw-semibold" id="nombreCompleto"></span>
 			                    </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">Usuario</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:text="${session.usuario.ssoId}"></span>
+		                            <span class="fs-6 text-dark fw-semibold" id="usuario"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">RFC</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.rfc}"></span>
+		                            <span class="fs-6 text-dark fw-semibold" id="rfc"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">Estado Civil</label>
-		                            	<span class="fs-6 text-dark fw-semibold" th:switch="${colaborador.estadoCivil}">
-		                                	<span th:case="S">Soltero</span>
-		                                    <span th:case="C">Casado</span>
-		                                    <span th:case="D">Divorciado</span>
-		                                    <span th:case="V">Viudo</span>
-		                                    <span th:case="*">No Especificado</span>
-		                                </span>
+		                            	<span class="fs-6 text-dark fw-semibold" id="estadoCivil"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">NSS</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.nss}"></span>
+		                            <span class="fs-6 text-dark fw-semibold" id="nss"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">Fecha de Nacimiento</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.fechaNacimiento}"></span>
+		                            <span class="fs-6 text-dark fw-semibold" id="fechaNac"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">CURP</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.curp}"></span>
+		                            <span class="fs-6 text-dark fw-semibold" id="curp"></span>
 		                        </div>
 		                    </div>
 		                    <div class="col-md-6">
 		                    	<div class="p-3 bg-light rounded border">
 		                        	<label class="fw-bold text-muted d-block mb-1">Genero</label>
-		                            <span class="fs-6 text-dark fw-semibold" th:switch="${colaborador.genero}">
-		                            	<span th:case="M">Masculino</span>
-		                                <span th:case="F">Femenino</span>
-		                                <span th:case="*">Otro</span>
-		                            </span>
+		                            <span class="fs-6 text-dark fw-semibold" id="genero"></span>
 		                        </div>
 		                    </div>
 	                                
@@ -203,34 +194,33 @@
                         	<div class="col-md-6">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Correo Personal</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.correoPersonal}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="correoPersonal"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Teléfono Personal</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.telefonoPersonal}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="telefonoPersonal"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Correo Empresa</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${session.usuario.email}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="correoEmpresa"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Teléfono Empresa</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.telefonoEmpresa}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="telefonoEmpresa"></span>
                                 </div>
                             </div>
                             <div class="col-md-12">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Dirección Completa</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.direccionCompleta}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="direccionCompleta"></span>
                                 </div>
-                            </div>
-                                
+                            </div>     
                         </div>
                     </div>
 
@@ -240,29 +230,70 @@
                         	<div class="col-md-6">
                             	<div class="p-3 bg-light rounded border">
                                 	<label class="fw-bold text-muted d-block mb-1">Nombre del Contacto</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.contactoEmergenciaNombre}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="nombreContacto"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="p-3 bg-light rounded border">
                                     <label class="fw-bold text-muted d-block mb-1">Parentesco</label>
-                                    <span class="fs-6 text-dark fw-semibold" th:text="${colaborador.contactoEmergenciaParentesco}"></span>
+                                    <span class="fs-6 text-dark fw-semibold" id="parentesco"></span>
                                 </div>
                              </div>
                              <div class="col-md-12">
                                  <div class="p-3 bg-light rounded border">
                                      <label class="fw-bold text-muted d-block mb-1">Teléfono de Emergencia</label>
-                                     <span class="fs-6 text-dark fw-semibold text-danger" th:text="${colaborador.contactoEmergenciaTelefono}"></span>
+                                     <span class="fs-6 text-dark fw-semibold text-danger" id="telefonoEmergenca"></span>
                                  </div>
                              </div>
+                             
+                             <div id="contacto2" class="row g-3 m-0 p-0 d-none">
+                            	<hr class="my-4">
+                            	<div class="col-md-6">
+	                            	<div class="p-3 bg-light rounded border">
+	                                	<label class="fw-bold text-muted d-block mb-1">Nombre del Contacto</label>
+	                                    <span class="fs-6 text-dark fw-semibold" id="nombreContacto2"></span>
+	                                </div>
+	                            </div>
+	                            <div class="col-md-6">
+	                                <div class="p-3 bg-light rounded border">
+	                                    <label class="fw-bold text-muted d-block mb-1">Parentesco</label>
+	                                    <span class="fs-6 text-dark fw-semibold" id="parentesco2"></span>
+	                                </div>
+	                             </div>
+	                             <div class="col-md-12">
+	                                 <div class="p-3 bg-light rounded border">
+	                                     <label class="fw-bold text-muted d-block mb-1">Teléfono de Emergencia</label>
+	                                     <span class="fs-6 text-dark fw-semibold text-danger" id="telefonoEmergenca2"></span>
+	                                 </div>
+	                             </div>
+	                         </div>
+	                         
+	                         <div id="contacto3" class="row g-3 m-0 p-0 d-none">
+                            	<hr class="my-4">
+                            	<div class="col-md-6">
+	                            	<div class="p-3 bg-light rounded border">
+	                                	<label class="fw-bold text-muted d-block mb-1">Nombre del Contacto</label>
+	                                    <span class="fs-6 text-dark fw-semibold" id="nombreContacto3"></span>
+	                                </div>
+	                            </div>
+	                            <div class="col-md-6">
+	                                <div class="p-3 bg-light rounded border">
+	                                    <label class="fw-bold text-muted d-block mb-1">Parentesco</label>
+	                                    <span class="fs-6 text-dark fw-semibold" id="parentesco3"></span>
+	                                </div>
+	                             </div>
+	                             <div class="col-md-12">
+	                                 <div class="p-3 bg-light rounded border">
+	                                     <label class="fw-bold text-muted d-block mb-1">Teléfono de Emergencia</label>
+	                                     <span class="fs-6 text-dark fw-semibold text-danger" id="telefonoEmergenca3"></span>
+	                                 </div>
+	                             </div>
+	                         </div>
                                 
-                         </div>
-                   </div>
+                        </div>
+                   	</div>
             	</div>
         	</div>
-	        <div th:if="${colaborador == null}" class="alert alert-warning mb-0">
-	        	No se encontraron registros de perfil para este usuario.
-	        </div>
 	    </div>
 	    <div class="card-footer text-end bg-light py-3">
 	    	<button type="button" class="btn btn-secondary" onclick="regresarAlMenu()">
@@ -273,26 +304,24 @@
 	
 	<!-- PANEL 2: MIS VACACIONES -->
 	<div id="panelVacaciones" class="card shadow border-0 d-none">	    
-		<div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: #1a365d;">
+		<div class="card-header text-white d-flex justify-content-between align-items-center py-3 px-3 px-md-4" style="background-color: #1a365d;">
 	    	<h5 class="card-title fw-bold mb-0">
 	        	<i class="bi bi-file-earmark-text me-2"></i>Periodos de Vacaciones
 	        </h5>
-	            <button type="button" class="btn-close btn-close-white ms-1" onclick="regresarAlMenu()" aria-label="Close"></button>
+	            <button type="button" class="btn-close btn-close-white me-2 me-md-3" onclick="regresarAlMenu()" aria-label="Close"></button>
 	    </div>
 	    <div class="card-body p-4">
 		    <div class="d-flex align-items-center gap-2">
 		            <span class="badge bg-light text-dark fs-6 border py-2 px-3">
-		                <i class="bi bi-calendar-check text-success me-1"></i> 
-		                Dias Disponibles Totales: <strong class="text-primary" th:text="${diasDisponibles ?: 0}"></strong>
+		                <i class="bi bi-calendar-check text-success me-1"></i>Dias Disponibles Totales: <strong class="text-primary" id = "diasDisponiblesTotales"></strong>
 		            </span>
-					<div th:if="${periodos != null and !#lists.isEmpty(periodos)}">
-		            	<!-- BOTÓN NUEVA SOLICITUD -->
+					<div id = "botonSolicitar" class = "d-none">
 		            	<button type="button" class="btn btn-success btn-sm fw-bold py-2" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud"> Solicitar Vacaciones</button>
 		            </div>
 		    </div>
 		</div>
 	    <div class="card-body p-3">
-	    	<div th:if="${periodos != null and !#lists.isEmpty(periodos)}" class="table-responsive">
+	    	<div id="informacionPeriodos" class="d-none">
 	        	<table class="table table-striped table-hover align-middle border text-center text-nowrap mb-0">
 	            	<thead class="text-white" style="background-color: #1a365d;">
 	                	<tr>
@@ -304,28 +333,10 @@
 	                        <th>Días <br class="d-lg-none"> Disponibles</th>
 	                    </tr>
 	                </thead>
-	                <tbody>
-	                	<tr th:each="p : ${periodos}">
-	                    	<td class="fw-bold text-dark" th:text="${p.anioPeriodo}"></td>
-	                        <td>
-	                        	<span class="fw-bold d-block text-dark" th:text="${p.fechaInicio}"></span>
-	                            <small class="text-muted">Al</small>
-	                            <span class="fw-bold d-block text-dark" th:text="${p.fechaFin}"></span>
-	                        </td>
-	                        <td>
-	                        	<span th:text="${p.fechaCaducidad}"
-	                        			th:class="${#temporals.createToday().isAfter(p.fechaCaducidad)} ? 'badge text-white fw-bold' : 'badge bg-warning text-dark fw-bold'"
-          								th:style="${#temporals.createToday().isAfter(p.fechaCaducidad)} ? 'background-color: #c81430;' : ''">
-    							</span>
-    						</td>
-	                        <td><span class="badge bg-success fs-6" th:text="${p.diasOtorgados}"></span></td>
-                            <td><span class="badge fs-6" style="background-color: #c81430;" th:text="${p.diasTomados}"></span></td>
-                            <td><span class="badge fs-6" style="background-color: #1a365d;" th:text="${p.diasDisponibles}"></span></td>
-	                    </tr>
-	                </tbody>
+	                <tbody id = "tablaPeriodos"></tbody>
 	            </table>
 	        </div>
-	        <div th:if="${periodos == null or #lists.isEmpty(periodos)}" class="alert alert-warning mb-0">
+	        <div id = "sinPeriodos" class="alert alert-warning mb-0 d-none">
 	        	No hay periodos de vacaciones registrados.
 	        </div>
 	    </div>
@@ -334,7 +345,7 @@
 	        	<i class="bi bi-arrow-left me-1"></i> Regresar
 	        </button>
 	    </div>
-	    <div class="modal fade text-start" th:id="modalNuevaSolicitud" tabindex="-1" aria-hidden="true">
+	    <div class="modal fade text-start" id="modalNuevaSolicitud" tabindex="-1" aria-hidden="true">
 	    	<div class="modal-dialog modal-dialog-centered modal-lg">
 	        	<div class="modal-content border-0 shadow">
 	            	<div class="modal-header text-white" style="background-color: #1a365d;">
@@ -343,7 +354,7 @@
 	                    </h5>
 	                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 	                </div>
-	                <form th:action="@{/}" method="post" id="formSolicitudVacaciones">
+	                <form method="post" id="formSolicitudVacaciones">
 		                <div class="modal-body p-4">
 		                    
 		                    <!-- Días disponibles -->
@@ -351,7 +362,7 @@
 		                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
 		                        <div>
 		                            Días disponibles: 
-		                            <strong class="fw-bold" th:text="${diasDisponibles ?: 0}"></strong> días.
+		                            <strong class="fw-bold" id = "modalDiasDisponibles"></strong> días.
 		                        </div>
 		                    </div>
 		                    <div class="mb-3">
@@ -369,7 +380,7 @@
 		                    <input type="hidden" id="fechaFin" name="fechaFin" required>
 		                    
 		                    <!-- ÚLTIMO DÍA TRABAJADO (Aparece solo si el esquema del colaborador es ALTERNO) -->
-		                    <div class="mb-3" th:if="${colaborador != null and colaborador.diasLaborales == 'ALTERNO'}">
+		                    <div id = "modUltimoDiaTrabajado" class="mb-3 d-none">
 		                        <label for="ultimoDiaTrabajado" class="form-label fw-bold text-dark">
 		                            Último Día Trabajado <span class="text-danger">*</span>
 		                        </label>
@@ -397,7 +408,7 @@
 		                <!-- PIE DEL MODAL -->
 		                <div class="modal-footer bg-light">
 		                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-		                    <button type="submit" class="btn text-white fw-bold" style="background-color: #1a365d;">Enviar Solicitud</button>
+		                    <button type="submit" class="btn text-white fw-bold" onclick="generarSolicitud(event)" style="background-color: #1a365d;">Enviar Solicitud</button>
 		                </div>
 		            </form>
 	            </div>
@@ -408,17 +419,14 @@
 		<div class="modal fade" id="modalRespuesta" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
 		    <div class="modal-dialog modal-dialog-centered">
 		        <div class="content modal-content shadow border-0">
-		            <div class="modal-header text-white" 
-		                 th:classappend="${mensajeOk != null} ? 'bg-success' : 'bg-danger'">
+		            <div class="modal-header text-white" id = "modalRespuestaHeader">
 		                <h5 class="modal-title fw-bold">
-		                    <i class="bi" th:classappend="${mensajeOk != null} ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
-		                    <span th:text="${mensajeOk != null} ? '¡Solicitud Exitosa!' : 'Error en la Solicitud'"></span>
+		                    <i class="bi" id = "modalRespuestaIcono"></i>
+		                    <span id = "modalRespuestaTitulo"></span>
 		                </h5>
 		                <button type="button" class="btn-close btn-close-white" onclick="regresarAlMenu()" data-bs-dismiss="modal" aria-label="Close"></button>
 		            </div>
-		            <div class="modal-body p-4 text-center fs-6">
-		                <p class="mb-0" th:text="${mensajeOk ?: mensajeError}"></p>
-		            </div>
+		            <div class="modal-body p-4 text-center fs-6"><p class="mb-0" id = "modalRespuestaTexto"></p></div>
 		            <div class="modal-footer bg-light border-0">
 		                <button type="button" class="btn btn-secondary w-100 fw-bold" onclick="regresarAlMenu()" data-bs-dismiss="modal">Entendido</button>
 		            </div>
@@ -428,14 +436,14 @@
 	
 	<!-- PANEL 3: MIS SOLICITUDES -->
 	<div id="panelSolicitudes" class="card shadow border-0 d-none">
-		<div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: #1a365d;">
+		<div class="card-header text-white d-flex justify-content-between align-items-center py-3 px-3 px-md-4" style="background-color: #1a365d;">
 	    	<h5 class="card-title fw-bold">
 	        	<i class="bi bi-calendar-check me-2"></i>Historial de Solicitudes
 	        </h5>
-	        <button type="button" class="btn-close btn-close-white" onclick="regresarAlMenu()" aria-label="Close"></button>
+	        <button type="button" class="btn-close btn-close-white  me-2 me-md-3" onclick="regresarAlMenu()" aria-label="Close"></button>
 	    </div>
 	    <div class="card-body p-4">
-	    	<div th:if="${solicitudes != null and !#lists.isEmpty(solicitudes)}" class="table-responsive">
+	    	<div id = "informacionSolicitudes" class="table-responsive d-none">
 	        	<table class="table table-striped table-hover align-middle border text-center text-nowrap mb-0">
 	            	<thead class="text-white" style="background-color: #1a365d;">
 	                	<tr>
@@ -446,119 +454,10 @@
 	                        <th></th>
 	                    </tr>
 	                </thead>
-	                <tbody>
-	                	<th:block th:each="s, stat : ${solicitudes}">
-	                		<tr style="cursor: pointer;"
-                            	data-bs-toggle="modal" 
-                            	th:data-bs-target="'#modalSolicitud-' + ${stat.index}" 
-                            	title="Haz clic para ver el detalle de validación">
-		                    	<td>
-		                        	<span class="fw-bold d-block text-dark" th:text="${s.fechaInicio}"></span>
-		                            <small class="text-muted">Al</small>
-		                            <span class="fw-bold d-block text-dark" th:text="${s.fechaFin}"></span>
-		                        </td>
-		                        <td><span class="badge bg-secondary fs-6" th:text="${s.diasSolicitados}"></span></td>
-		                        <td class="text-start text-wrap" style="max-width: 200px;">
-		                        	<small class="text-dark" th:text="${s.motivo != null ? s.motivo : 'Sin motivo registrado'}"></small>
-		                        </td>
-		                        <td>
-		                        	<div class="d-flex align-items-center justify-content-center gap-2">
-		                        		<span class="badge fs-6" 
-		                        				th:classappend="${s.estado == 'APROBADA' ? 'bg-success' : (s.estado == 'RECHAZADA' ? 'bg-danger' : 'bg-warning text-dark')}"
-		                                		th:text="${s.estado}"></span>
-		                            </div>
-		                        </td>
-		                        <td>
-		                        	<i class="bi bi-chevron-right text-muted fs-6"></i>
-		                        </td>
-		                    </tr>
-		                    
-		                    <div class="modal fade text-start" th:id="'modalSolicitud-' + ${stat.index}" tabindex="-1" aria-hidden="true">
-	                            <div class="modal-dialog modal-dialog-centered modal-lg">
-	                                <div class="modal-content border-0 shadow">
-	                                    <div class="modal-header text-white" style="background-color: #1a365d;">
-	                                        <h5 class="modal-header-title modal-title fs-6 fw-bold">
-	                                            <i class="bi bi-info-circle me-2"></i>Detalle de Validación de Solicitud
-	                                        </h5>
-	                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-	                                    </div>
-	                                    <div class="modal-body p-4">
-	                                        
-	                                        <!-- Resumen de fechas solicitadas -->
-	                                        <div class="p-3 bg-light rounded border mb-4 text-center">
-	                                            <small class="text-uppercase text-muted fw-bold d-block mb-1">Periodo Solicitado</small>
-	                                            <span class="fw-bold text-dark fs-6" th:text="${s.fechaInicio}"></span>
-	                                            <span class="text-muted mx-2 fs-6 fw-normal">al</span>
-	                                            <span class="fw-bold text-dark fs-6" th:text="${s.fechaFin}"></span>
-	                                            <span class="badge bg-primary ms-2" th:text="${s.diasSolicitados + ' día(s)'}"></span>
-	                                        </div>
-	
-	                                        <!-- SECCIÓN 1: VALIDACIÓN JEFE DIRECTO -->
-	                                        <div class="card mb-3 border">
-	                                            <div class="card-header bg-white fw-bold text-dark py-2">
-	                                                <i class="bi bi-person-badge me-2 text-primary"></i>Validación Jefe Directo
-	                                            </div>
-	                                            <div class="card-body p-3">
-		                        					<div th:if="${s.fechaRespuestaJefe != null}">
-		                            					<small class="fw-bold d-block text-success"><i class="bi bi-check-circle me-1"></i>Atendido</small>
-		                                				<small class="text-muted d-block" th:text="${#temporals.format(s.fechaRespuestaJefe, 'yyyy-MM-dd - HH:mm')}"></small>
-		                            					<!-- Si fue aprovada -->
-		                            					<small th:if="${s.motivoRechazoJefe == null or #strings.isEmpty(s.motivoRechazoJefe)}"
-		                            							class="badge bg-info-subtle text-primary border border-info-subtle px-2 py-1">
-		                            						<i class="bi bi-person-check-fill me-1"></i>Aprobado por Jefe
-							        					</small>
-		                            				</div>
-		                            				<!-- Si hubo rechazo por parte del jefe -->
-		                            				<div th:if="${s.motivoRechazoJefe != null and !#strings.isEmpty(s.motivoRechazoJefe)}">
-		                            					<div class="badge bg-danger-subtle text-danger text-start d-block p-2 text-wrap">
-		                            						<span class="fw-bold d-block mb-1">Motivo rechazo:</span>
-		                            						<span class="fw-normal" th:text="${s.motivoRechazoJefe}"></span>
-		                                				</div>
-		                            				</div>
-		                            				<div th:if="${s.fechaRespuestaJefe == null}">
-		                            					<span class="badge bg-light text-dark border px-3 py-2"><i class="bi bi-clock me-1"></i>Pendiente de revisión</span>
-		                            				</div>
-		                                        </div>
-		                        			</div>
-		                        			
-		                        			<div class="card border">
-	                                            <div class="card-header bg-white fw-bold text-dark py-2">
-	                                                <i class="bi bi-building me-2 text-primary"></i>Validación Recursos Humanos
-	                                            </div>
-	                                            <div class="card-body p-3">
-						                        	<div th:if="${s.fechaRespuestaRh != null}">
-						                            	<small class="fw-bold d-block text-success"><i class="bi bi-check-circle me-1"></i>Atendido</small>
-						                                <small class="text-muted d-block" th:text="${#temporals.format(s.fechaRespuestaRh, 'yyyy-MM-dd - HH:mm')}"></small>
-						                            	<!-- Si fue aprovada -->
-						                            	<small th:if="${s.motivoRechazoRh == null or #strings.isEmpty(s.motivoRechazoRh)}"
-						                            			class="badge bg-info-subtle text-primary border border-info-subtle px-2 py-1">
-						                            		<i class="bi bi-check-all me-1"></i>Aprobado por RH
-											        	</small>
-						                            </div>
-						                            <!-- Si hubo rechazo por parte de RH -->
-						                            <div th:if="${s.motivoRechazoRh != null and !#strings.isEmpty(s.motivoRechazoRh)}">
-						                            	<div class="badge bg-danger-subtle text-danger text-start d-block p-2 text-wrap">
-						                            		<span class="fw-bold d-block mb-1">Motivo rechazo:</span>
-						                            		<span class="fw-normal" th:text="${s.motivoRechazoRh}"></span>
-						                                </div>
-						                            </div>
-						                            <div th:if="${s.fechaRespuestaRh == null}">
-						                            	<span class="badge bg-light text-dark border px-3 py-2"><i class="bi bi-clock me-1"></i>Pendiente de revisión</span>
-						                            </div>
-		                            			</div>
-		                      				</div>
-		                      			</div>
-		                      			<div class="modal-footer bg-light py-2">
-	                                        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Cerrar</button>
-	                                    </div>
-	                              	</div>
-	                            </div>
-                            </div>
-	                    </th:block>
-	                </tbody>
+	                <tbody id = "tablaSolicitudes"></tbody>
 	            </table>
 	        </div>
-	        <div th:if="${solicitudes == null or #lists.isEmpty(solicitudes)}" class="alert alert-warning mb-0">
+	        <div id = "sinSolicitudes" class="alert alert-warning mb-0 d-none">
 	        	No se encontraron solicitudes registradas.
 	        </div>
 	    </div>
@@ -606,43 +505,6 @@
 	        }
 	    });
 	</script>
-	<script th:inline="javascript">
-	    document.addEventListener('DOMContentLoaded', function () {
-	        // Calcular fecha mínima permitida (Hoy + 5 días)
-	        const fechaMinima = new Date();
-	        fechaMinima.setDate(fechaMinima.getDate() + 5);
-	
-	        flatpickr("#rangoFechasContainer", {
-	            inline: true,
-	        	mode: "range",
-	            locale: "es",
-	            dateFormat: "Y-m-d",
-	            minDate: fechaMinima,
-	            disableMobile: "true",
-	            
-	            onChange: function(selectedDates, dateStr, instance) {
-	                // Cuando el usuario elige el rango completo (inicio y fin)
-	                if (selectedDates.length === 2) {
-	                    document.getElementById('fechaInicio').value = instance.formatDate(selectedDates[0], "Y-m-d");
-	                    document.getElementById('fechaFin').value = instance.formatDate(selectedDates[1], "Y-m-d");
-	                } else {
-	                    document.getElementById('fechaInicio').value = "";
-	                    document.getElementById('fechaFin').value = "";
-	                }
-	            }
-	        });
-	        /*[# th:if="${mensajeOk != null or mensajeError != null}"]*/
-            regresarAlMenu();
-
-            setTimeout(function() {
-                const elModal = document.getElementById('modalRespuesta');
-                if (elModal) {
-                    const modalInstancia = new bootstrap.Modal(elModal);
-                    modalInstancia.show();
-                }
-            }, 150);
-        /*[/]*/
-	    });
-	</script>
+	<script th:src="@{/static/js/portal.js}"></script>
 </body>
 </html>

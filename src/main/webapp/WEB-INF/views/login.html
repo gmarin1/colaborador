@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>PORTAL DE COLABORADORES</title>
@@ -22,14 +22,14 @@
         <div class="card shadow p-4" style="width: 800px; height:auto">
             <h2 class="text-center mb-4" style="color: #c81430;">Iniciar Sesión</h2>
             
-            <div th:if="${error != null}" 
+            <div th:if="${param.error != null or error != null}" 
 	             class="alert alert-danger alert-dismissible fade show" 
 	             role="alert">
-	            <span th:text="${error}"></span>
+	            <span>Usuario o contraseña incorrectos</span>
 	            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	        </div>
             
-            <form action="login" method="POST">
+            <form th:action="@{/process-login}" method="POST">
 	            <div class="mb-5">
 				  <label for="ssoId" class="form-label h3">Usuario</label>
 				  <input class="form-control form-control-lg"
