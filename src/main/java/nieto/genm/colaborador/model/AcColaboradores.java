@@ -156,6 +156,12 @@ public class AcColaboradores {
 	
 	@Column(name="contacto_emergencia_telefono_3", length = 15)
 	private String contactoEmergenciaTelefono3;
+	
+	@Column(name="periodo_prueba_dias")
+	private Integer periodoPruebaDias;
+	
+	@Column(name="fecha_inicio_periodo_actual")
+	private LocalDate fechaInicioPeriodoActual;
 
 	//constructor vacio
 	
@@ -303,4 +309,10 @@ public class AcColaboradores {
 
 	public String getContactoEmergenciaTelefono3() {return contactoEmergenciaTelefono3;}
 	public void setContactoEmergenciaTelefono3(String contactoEmergenciaTelefono3) {this.contactoEmergenciaTelefono3 = contactoEmergenciaTelefono3;}
+
+	public Integer getPeriodoPruebaDias() {return periodoPruebaDias;}
+	public void setPeriodoPruebaDias(Integer periodoPruebaDias) {this.periodoPruebaDias = periodoPruebaDias;}
+
+	public LocalDate getFechaInicioPeriodoActual() {return fechaInicioPeriodoActual;}
+	public void setFechaInicioPeriodoActual(LocalDate fechaInicioPeriodoActual) {this.fechaInicioPeriodoActual = fechaInicioPeriodoActual;}
 }

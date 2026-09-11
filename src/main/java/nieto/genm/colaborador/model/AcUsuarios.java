@@ -114,6 +114,9 @@ public class AcUsuarios implements Serializable {
 	@Column(name="id_puesto")
 	private Integer idPuesto;
 	
+	@Column(name="rh_delegado", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+	private Integer rhDelegado = 0;
+	
 	 // Transientes
     @Transient
     private String permisos_roles;
@@ -223,12 +226,37 @@ public class AcUsuarios implements Serializable {
 	public Integer getIdPuesto() {return idPuesto;}
 	public void setIdPuesto(Integer idPuesto) {this.idPuesto = idPuesto;}
 	
+	public Integer getRhDelegado() {return rhDelegado;}
+	public void setRhDelegado(Integer rhDelegado) {this.rhDelegado = rhDelegado;}
+
+	public String getPermisos_roles() {return permisos_roles;}
+	public void setPermisos_roles(String permisos_roles) {this.permisos_roles = permisos_roles;}
+
+	public Set<UserProfile> getUserProfiles() {return userProfiles;}
+	public void setUserProfiles(Set<UserProfile> userProfiles) {this.userProfiles = userProfiles;}
+
+	public List<Empresa> getPlantas() {return plantas;}
+	public void setPlantas(List<Empresa> plantas) {this.plantas = plantas;}
+
+	public int getUnineg() {return unineg;}
+	public void setUnineg(int unineg) {this.unineg = unineg;}
+
+	public List<PermisosDto> getPermisos() {return permisos;}
+	public void setPermisos(List<PermisosDto> permisos) {this.permisos = permisos;}
+
 	@Override
-    public String toString() {
-		return "User [id=" + id + ", ssoId=" + ssoId + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", email=" + email + ", corporativo=" + corporativo
-                + ", telefono=" + telefono + ", estatus=" + estatus + ", tipo_user=" + tipoUser
-                + ", createDateTime=" + createdatetime + ", updateDateTime=" + updatedatetime
-                + ", super_usuario=" + superUsuario + ", pwresp=" + pwresp + ", unineg=" + unineg + "]";
-    }
+	public String toString() {
+		return "AcUsuarios [id=" + id + ", aplicarDescuentos=" + aplicarDescuentos + ", auditoraden=" + auditoraden
+				+ ", autorizaDescuentos=" + autorizaDescuentos + ", consultaDescuentos=" + consultaDescuentos
+				+ ", createdatetime=" + createdatetime + ", email=" + email + ", estatus=" + estatus + ", firstName="
+				+ firstName + ", lastName=" + lastName + ", mPrecios=" + mPrecios + ", password=" + password
+				+ ", permisosDefault=" + permisosDefault + ", prueba=" + prueba + ", pwresp=" + pwresp
+				+ ", solicitarDescuentos=" + solicitarDescuentos + ", ssoId=" + ssoId + ", superUsuario=" + superUsuario
+				+ ", telefono=" + telefono + ", tema=" + tema + ", tipoUser=" + tipoUser + ", updatedatetime="
+				+ updatedatetime + ", resolucion=" + resolucion + ", fechaVencimientoToken=" + fechaVencimientoToken
+				+ ", tokenPin=" + tokenPin + ", tipoAcceso=" + tipoAcceso + ", corporativo=" + corporativo
+				+ ", shortcutsJson=" + shortcutsJson + ", idPuesto=" + idPuesto + ", rhDelegado=" + rhDelegado
+				+ ", permisos_roles=" + permisos_roles + ", userProfiles=" + userProfiles + ", plantas=" + plantas
+				+ ", unineg=" + unineg + ", permisos=" + permisos + "]";
+	}
 }

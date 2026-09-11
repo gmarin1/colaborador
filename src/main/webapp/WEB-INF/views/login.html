@@ -60,10 +60,9 @@
 	        var historyTraversal = event.persisted || 
 	            (typeof window.performance != 'undefined' && window.performance.navigation.type === 2);
 	        
-	        if (historyTraversal) {
+	        if (historyTraversal)
 	            // Recarga la página desde el servidor para forzar la validación de la sesión Java
 	            window.location.reload();
-	        }
 	    });
 	</script>
 

@@ -42,6 +42,13 @@ function obtenerDatos(){
 	.then(function(data) {
 		if(data && data.colaborador){
 			
+			if (data.colaborador.foto) 
+			    document.getElementById('fotoPerfil').src = hexABase64(data.colaborador.foto);
+			else {
+				document.getElementById('fotoPerfil').src =
+				'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${data.usuario.firstName} ${data.usuario.lastName}`) + '&background=1a365d&color=fff';
+			}
+			
 			//personales/Fiscales
 			document.getElementById("nombreCompleto").textContent = (data.usuario.firstName && data.usuario.lastName) ? `${data.usuario.firstName} ${data.usuario.lastName}` : "---";
 			document.getElementById("usuario").textContent = data.usuario.ssoId || "---";
@@ -92,6 +99,22 @@ function obtenerDatos(){
 			document.getElementById("perfilNoEncontrado").classList.remove("d-none");
 		}
 	});
+}
+
+function hexABase64(hexString, mimeType = 'image/jpeg') {
+    if (!hexString) return null;
+
+    // Quitar el prefijo '\x' de Postgres si viene presente
+    const hex = hexString.startsWith('\\x') ? hexString.substring(2) : hexString;
+
+    // Convertir Hexadecimal a Binario
+    let binary = '';
+    for (let i = 0; i < hex.length; i += 2) {
+        binary += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    // Retornar la cadena Base64 lista para el src de <img>
+    return `data:${mimeType};base64,${window.btoa(binary)}`;
 }
 
 function normalizarFecha(fecha) {
@@ -190,16 +213,38 @@ function solicitudesVac(){
 			data.solicitudes.forEach(function(s, index){
 				const fInicio = normalizarFecha(s.fechaInicio);
 				const fFin = normalizarFecha(s.fechaFin);
+				const fCancelacion = normalizarFecha(s.fechaCancelacion);
 				
 				let badgeEstado = 'bg-warning text-dark';
 				if (s.estado === 'APROBADA') badgeEstado = 'bg-success';
 				if (s.estado === 'RECHAZADA') badgeEstado = 'bg-danger';
+				if (s.estado === 'CANCELADA') badgeEstado = 'bg-secondary';
 				
 				const htmlJefe = generarHtmlValidacion(s.fechaRespuestaJefe, s.motivoRechazoJefe, 'JEFE');
 				const htmlRH = generarHtmlValidacion(s.fechaRespuestaRh, s.motivoRechazoRh, 'RH');
 				
+				let htmlCancelacion = '';
+				if (s.estado === 'CANCELADA') {
+					htmlCancelacion =
+					`<div class="card border border-secondary mb-3">
+						<div class="card-header bg-secondary text-white fw-bold py-2">
+							<i class="bi bi-x-circle me-2"></i>Detalle de Cancelación
+						</div>
+						<div class="card-body p-3 bg-light">
+							<div class="mb-2">
+								<small class="fw-bold text-muted d-block">Fecha de Cancelación:</small>
+								<span class="text-dark fs-6 fw-semibold">${fCancelacion || '---'}</span>
+							</div>
+							<div>
+								<small class="fw-bold text-muted d-block">Motivo de Cancelación:</small>
+								<span class="text-dark fs-6">${s.motivoCancelacion || '---'}</span>
+							</div>
+						</div>
+					</div>`;
+				}
+				
 				document.getElementById("tablaSolicitudes").innerHTML += `
-					<tr style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalSolicitud-${index}" title="Haz clic para ver el detalle de validación">
+					<tr data-bs-toggle="modal" data-bs-target="#modalSolicitud-${index}">
 						<td>
 							<span class="fw-bold d-block text-dark">${fInicio || '---'}</span>
 							<small class="text-muted">Al</small>
@@ -216,46 +261,51 @@ function solicitudesVac(){
 						</td>
 						<td>
 							<i class="bi bi-chevron-right text-muted fs-6"></i>
-								<div class="modal fade text-start" id="modalSolicitud-${index}" tabindex="-1" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-lg">
-										<div class="modal-content border-0 shadow">
-											<div class="modal-header text-white" style="background-color: #1a365d;">
-												<h5 class="modal-header-title modal-title fs-6 fw-bold">
-													<i class="bi bi-info-circle me-2"></i>Detalle de Validación de Solicitud
-												</h5>
-												<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body p-4">
-												<div class="p-3 bg-light rounded border mb-4 text-center">
-													<small class="text-uppercase text-muted fw-bold d-block mb-1">Periodo Solicitado</small>
-													<span class="fw-bold text-dark fs-6">${fInicio}</span>
-													<span class="text-muted mx-2 fs-6 fw-normal">al</span>
-													<span class="fw-bold text-dark fs-6">${fFin}</span>
-													<span class="badge bg-primary ms-2">${s.diasSolicitados || 0} día(s)</span>
-												</div>
-												<div class="card mb-3 border">
-													<div class="card-header bg-white fw-bold text-dark py-2">
-														<i class="bi bi-person-badge me-2 text-primary"></i>Validación Jefe Directo
-													</div>
-													<div class="card-body p-3">${htmlJefe}</div>
-												</div>
-												<div class="card border">
-													<div class="card-header bg-white fw-bold text-dark py-2">
-														<i class="bi bi-building me-2 text-primary"></i>Validación Recursos Humanos
-													</div>
-													<div class="card-body p-3">${htmlRH}</div>
-												</div>
-											</div>
-											<div class="modal-footer bg-light py-2">
-												<button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Cerrar</button>
-											</div>
-										</div>
-									</div>
-								</div>
 						</td>
-					</tr>
-				`;
+					</tr>`;
+								
+			document.getElementById("contenedorModales").innerHTML += `
+				<div class="modal fade text-start" id="modalSolicitud-${index}" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg">
+						<div class="modal-content border-0 shadow">
+							<div class="modal-header text-white" style="background-color: #1a365d;">
+								<h5 class="modal-header-title modal-title fs-6 fw-bold">
+									<i class="bi bi-info-circle me-2"></i>Detalle de Estado de la Solicitud
+								</h5>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body p-4">
+								<div class="p-3 bg-light rounded border mb-4 text-center">
+									<small class="text-uppercase text-muted fw-bold d-block mb-1">Periodo Solicitado</small>
+									<span class="fw-bold text-dark fs-6">${fInicio}</span>
+									<span class="text-muted mx-2 fs-6 fw-normal">al</span>
+									<span class="fw-bold text-dark fs-6">${fFin}</span>
+									<span class="badge bg-primary ms-2">${s.diasSolicitados || 0} día(s)</span>
+								</div>
+															
+								${htmlCancelacion}
+															
+								<div class="card mb-3 border">
+									<div class="card-header bg-white fw-bold text-dark py-2">
+										<i class="bi bi-person-badge me-2 text-primary"></i>Validación Jefe Directo
+									</div>
+										<div class="card-body p-3">${htmlJefe}</div>
+									</div>
+									<div class="card border">
+									<div class="card-header bg-white fw-bold text-dark py-2">
+										<i class="bi bi-building me-2 text-primary"></i>Validación Recursos Humanos
+									</div>
+										<div class="card-body p-3">${htmlRH}</div>
+								</div>
+							</div>
+							<div class="modal-footer bg-light py-2">
+								<button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Cerrar</button>
+							</div>
+						</div>
+					</div>
+				</div>`;
 			});
+
 						
 			
 			document.getElementById("informacionSolicitudes").classList.remove("d-none");

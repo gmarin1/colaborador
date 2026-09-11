@@ -58,7 +58,7 @@ public class PortalService {
 		}
 		
 		for (AcSolicitudesVacaciones s : solicitud) {
-			if(!s.getEstado().equals("RECHAZADA"))
+			if(!s.getEstado().equals("RECHAZADA") && !s.getEstado().equals("CANCELADA"))
 				diasSolicitados += s.getDiasSolicitados();
 		}
 		

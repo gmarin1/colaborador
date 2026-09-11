@@ -56,6 +56,18 @@ public class AcSolicitudesVacaciones  {
 
 	@Column(name="updatedatetime", nullable = false)
 	private LocalDateTime updatedatetime  = LocalDateTime.now();
+	
+	@Column(name="cancelado_por")
+	private Integer canceladoPor;
+	
+	@Column(name="fecha_cancelacion")
+	private LocalDateTime fechaCancelacion;
+	
+	@Column(name="motivo_cancelacion")
+	private String motivoCancelacion;
+	
+	@Column(name="ultimo_dia_trabajado")
+	private LocalDate ultimoDiaTrabajado;
 
 	//constructor vacio
 	
@@ -104,4 +116,16 @@ public class AcSolicitudesVacaciones  {
 
 	public LocalDateTime getUpdatedatetime() {return updatedatetime;}
 	public void setUpdatedatetime(LocalDateTime updatedatetime) {this.updatedatetime = updatedatetime;}
+
+	public Integer getCanceladoPor() {return canceladoPor;}
+	public void setCanceladoPor(Integer canceladoPor) {this.canceladoPor = canceladoPor;}
+
+	public LocalDateTime getFechaCancelacion() {return fechaCancelacion;}
+	public void setFechaCancelacion(LocalDateTime fechaCancelacion) {this.fechaCancelacion = fechaCancelacion;}
+
+	public String getMotivoCancelacion() {return motivoCancelacion;}
+	public void setMotivoCancelacion(String motivoCancelacion) {this.motivoCancelacion = motivoCancelacion;}
+
+	public LocalDate getUltimoDiaTrabajado() {return ultimoDiaTrabajado;}
+	public void setUltimoDiaTrabajado(LocalDate ultimoDiaTrabajado) {this.ultimoDiaTrabajado = ultimoDiaTrabajado;}
 }
